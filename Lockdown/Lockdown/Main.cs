@@ -54,7 +54,7 @@ namespace Lockdown {
         private static uint LWA_ALPHA = 0x2;
         #endregion
 
-        string pass = "maple1231-0207";
+        string pass = "1234";
         string[] ignore = { "WindowsInternal", "ApplicationFrameHost", "NVIDIA Share", "Taskmgr" };
 
         //https://www.meziantou.net/detect-the-opening-of-a-new-window-in-csharp.htm
