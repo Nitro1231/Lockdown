@@ -38,7 +38,7 @@
             this.title.Font = new System.Drawing.Font("Segoe UI Symbol", 48F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.title.Location = new System.Drawing.Point(0, 50);
             this.title.Name = "title";
-            this.title.Size = new System.Drawing.Size(600, 118);
+            this.title.Size = new System.Drawing.Size(600, 100);
             this.title.TabIndex = 8;
             this.title.Text = "Access Denied";
             this.title.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -48,9 +48,9 @@
             this.text.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(25)))), ((int)(((byte)(25)))), ((int)(((byte)(25)))));
             this.text.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.text.Font = new System.Drawing.Font("Segoe UI Symbol", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.text.Location = new System.Drawing.Point(0, 106);
+            this.text.Location = new System.Drawing.Point(0, 150);
             this.text.Name = "text";
-            this.text.Size = new System.Drawing.Size(600, 144);
+            this.text.Size = new System.Drawing.Size(600, 100);
             this.text.TabIndex = 9;
             this.text.Text = "This computer is locked due to the security issue.";
             this.text.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;

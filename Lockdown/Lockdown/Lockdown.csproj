@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Lockdown.cs" />
     <Compile Include="LockdownForm.cs">
       <SubType>Form</SubType>
     </Compile>
