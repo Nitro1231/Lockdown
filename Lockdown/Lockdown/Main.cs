@@ -19,12 +19,13 @@ namespace Lockdown {
 
         private void Main_Load(object sender, EventArgs e) {
             label1.Font = pwBox.Font;
-            lockdown.Lock(true);
         }
 
         private void checkPW(string pw) {
-            if (pw.Equals(pass))
-                Close();
+            if (pw.Equals(pass)) {
+                lockdown.Unlock();
+                mainTimer.Enabled = false;
+            }
         }
 
         private void PwBox_TextChanged(object sender, EventArgs e) {
@@ -34,5 +35,9 @@ namespace Lockdown {
         }
 
         private void Button1_Click(object sender, EventArgs e) { checkPW(pwBox.Text); }
+
+        private void mainTimer_Tick(object sender, EventArgs e) {
+            lockdown.Lock();
+        }
     }
 }

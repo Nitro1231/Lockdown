@@ -4,9 +4,10 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Timers;
 using System.Windows.Forms;
-using Timer = System.Timers.Timer;
+
+//https://www.meziantou.net/detect-the-opening-of-a-new-window-in-csharp.htm
+//https://stackoverflow.com/questions/27086816/how-to-get-process-type-app-background-process-or-windows-process
 
 namespace Lockdown {
     class Lockdown {
@@ -56,15 +57,15 @@ namespace Lockdown {
         private static uint LWA_ALPHA = 0x2;
         #endregion
 
-        private Timer timer;
         private List<string> whitelist;
+        private List<LockdownForm> lockdownForms;
+        private List<BackgroundForm> backgroundForms;
         private List<IntPtr> handles, blockedHandles;
-
-        //https://www.meziantou.net/detect-the-opening-of-a-new-window-in-csharp.htm
-        //https://stackoverflow.com/questions/27086816/how-to-get-process-type-app-background-process-or-windows-process
 
         public Lockdown() {
             whitelist = new List<string>();
+            lockdownForms = new List<LockdownForm>();
+            backgroundForms = new List<BackgroundForm>();
             handles = new List<IntPtr>();
             blockedHandles = new List<IntPtr>();
 
@@ -73,26 +74,11 @@ namespace Lockdown {
             whitelist.Add("NVIDIA Share");
             whitelist.Add("Taskmgr");
             whitelist.Add("Lockdown");
-            //whitelist.Add("devenv");
+            whitelist.Add("devenv");
             whitelist.Add("TextInputHost");
-
-
-            timer = new Timer();
-            timer.Interval = 1000; // 10 Sec.
-            timer.Elapsed += new ElapsedEventHandler(MainTick);
         }
 
-        public void Lock(bool status) {
-            handles.Clear();
-            blockedHandles.Clear();
-
-            if (status)
-                timer.Start();
-            else
-                timer.Stop();
-        }
-
-        private void MainTick(object sender, ElapsedEventArgs e) {
+        public void Lock() {
             GetWindowHandles(out handles);
             foreach (IntPtr h in handles) {
                 uint pid;
@@ -104,16 +90,19 @@ namespace Lockdown {
                     LockdownWindow(h);
                 }
             }
+        }
 
-            //Process[] processes = Process.GetProcesses();
-            //foreach (Process p in processes) {
-            //    if (!string.IsNullOrEmpty(p.MainWindowTitle) && p.MainWindowHandle != IntPtr.Zero && p.Responding && !ifContainArray(p.ProcessName, ignore)) {
-            //        //richTextBox1.AppendText(p.ProcessName + "\n" + p.MainWindowTitle + "\n===========\n");
-            //        lockdownWindow(p);
-            //    }
-            //}
+        public void Unlock() {
+            foreach (LockdownForm lockdown in lockdownForms)
+                lockdown.Close();
+            foreach (BackgroundForm background in backgroundForms)
+                background.Close();
+            Clear();
+        }
 
-            timer.Enabled = false;
+        public void Clear() {
+            handles.Clear();
+            blockedHandles.Clear();
         }
 
         private void LockdownWindow(IntPtr p) {
@@ -137,6 +126,9 @@ namespace Lockdown {
             lockdown.SetBounds(0, (h - lockdown.Height) / 2, 0, 0, BoundsSpecified.Location);
             lockdown.Show();
             SetLayeredWindowAttributes(lockdown.Handle, 0, 255, LWA_ALPHA);
+
+            lockdownForms.Add(lockdown);
+            backgroundForms.Add(background);
         }
 
         private void GetWindowHandles(out List<IntPtr> handles) {
@@ -149,7 +141,6 @@ namespace Lockdown {
 
         private bool FilterCallback(IntPtr hWnd, int lParam) {
             string title = GetWindowTitle(hWnd);
-            
             if (IsWindowVisible(hWnd) && !blockedHandles.Contains(hWnd) && !whitelist.Contains(title) && !string.IsNullOrEmpty(title))
                 WindowHandles.Add(hWnd);
             return true;
