@@ -123,10 +123,12 @@ namespace Lockdown {
             int w = info.Right - info.Left;
             int h = info.Bottom - info.Top;
 
+            // Initialize new forms and change the BackgroundForm's size identical to the target.
             LockdownForm lockdown = new LockdownForm();
             BackgroundForm background = new BackgroundForm(lockdown);
             background.Size = new Size(w, h);
 
+            // Change window style and set a target as the parent window.
             SetWindowLong(background.Handle, GWL_EXSTYLE, GetWindowLong(background.Handle, GWL_EXSTYLE) | WS_EX_LAYERED);
             SetParent(background.Handle, hWnd);
             background.SetBounds(0, 0, 0, 0, BoundsSpecified.Location);
