@@ -29,7 +29,7 @@ namespace Lockdown {
         private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
 
         [DllImport("user32.dll", SetLastError = true)]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -57,56 +57,69 @@ namespace Lockdown {
         private static uint LWA_ALPHA = 0x2;
         #endregion
 
-        private List<string> whitelist;
+        private List<string> exception;
         private List<LockdownForm> lockdownForms;
         private List<BackgroundForm> backgroundForms;
         private List<IntPtr> handles, blockedHandles;
 
+        /// <summary>
+        ///     Initialize the Lockdown class and add processes to the whitelist.
+        /// </summary>
         public Lockdown() {
-            whitelist = new List<string>();
+            exception = new List<string>();
             lockdownForms = new List<LockdownForm>();
             backgroundForms = new List<BackgroundForm>();
             handles = new List<IntPtr>();
             blockedHandles = new List<IntPtr>();
 
-            whitelist.Add("WindowsInternal");
-            whitelist.Add("ApplicationFrameHost");
-            whitelist.Add("NVIDIA Share");
-            whitelist.Add("Taskmgr");
-            whitelist.Add("Lockdown");
-            whitelist.Add("devenv");
-            whitelist.Add("TextInputHost");
+            // Add exceptions.
+            exception.Add("WindowsInternal");
+            exception.Add("ApplicationFrameHost");
+            exception.Add("NVIDIA Share");
+            exception.Add("Taskmgr");
+            exception.Add("Lockdown");
+            exception.Add("devenv");
+            exception.Add("TextInputHost");
         }
 
+        /// <summary>
+        ///     Lockdown currently opened windows except for the windows that are already blocked.
+        /// </summary>
         public void Lock() {
-            GetWindowHandles(out handles);
-            foreach (IntPtr h in handles) {
+            // Get all window handles.
+            handles = GetWindowHandles();
+            foreach (IntPtr hWnd in handles) {
                 uint pid;
-                GetWindowThreadProcessId(h, out pid);
+                GetWindowThreadProcessId(hWnd, out pid);
                 Process p = Process.GetProcessById((int)pid);
-                if (!whitelist.Contains(p.ProcessName) && p.Responding) {
-                    Console.WriteLine(p.ProcessName);
-                    blockedHandles.Add(h);
-                    LockdownWindow(h);
+                if (!exception.Contains(p.ProcessName) && p.Responding) {
+                    //Console.WriteLine(p.ProcessName);
+                    blockedHandles.Add(hWnd);
+                    LockdownWindow(hWnd); // Lockdown window
                 }
             }
         }
 
+        /// <summary>
+        ///     Close all the LockdownForm and Back BackgroundForm that are currently open.
+        /// </summary>
         public void Unlock() {
             foreach (LockdownForm lockdown in lockdownForms)
                 lockdown.Close();
             foreach (BackgroundForm background in backgroundForms)
                 background.Close();
-            Clear();
-        }
-
-        public void Clear() {
             handles.Clear();
             blockedHandles.Clear();
         }
 
-        private void LockdownWindow(IntPtr p) {
-            GetWindowRect(p, out info);
+        /// <summary>
+        ///     Create a new LockdownForm and BackgroundForm that fits the target window and add them as a child window.
+        /// </summary>
+        /// <param name="hWnd">
+        ///     Window handle ID.
+        /// </param>
+        private void LockdownWindow(IntPtr hWnd) {
+            GetWindowRect(hWnd, out info);
             int w = info.Right - info.Left;
             int h = info.Bottom - info.Top;
 
@@ -115,14 +128,14 @@ namespace Lockdown {
             background.Size = new Size(w, h);
 
             SetWindowLong(background.Handle, GWL_EXSTYLE, GetWindowLong(background.Handle, GWL_EXSTYLE) | WS_EX_LAYERED);
-            SetParent(background.Handle, p);
+            SetParent(background.Handle, hWnd);
             background.SetBounds(0, 0, 0, 0, BoundsSpecified.Location);
             background.Show();
             SetLayeredWindowAttributes(background.Handle, 0, 200, LWA_ALPHA);
 
             lockdown.Width = w;
             SetWindowLong(lockdown.Handle, GWL_EXSTYLE, GetWindowLong(lockdown.Handle, GWL_EXSTYLE) | WS_EX_LAYERED);
-            SetParent(lockdown.Handle, p);
+            SetParent(lockdown.Handle, hWnd);
             lockdown.SetBounds(0, (h - lockdown.Height) / 2, 0, 0, BoundsSpecified.Location);
             lockdown.Show();
             SetLayeredWindowAttributes(lockdown.Handle, 0, 255, LWA_ALPHA);
@@ -131,21 +144,45 @@ namespace Lockdown {
             backgroundForms.Add(background);
         }
 
-        private void GetWindowHandles(out List<IntPtr> handles) {
+        /// <summary>
+        ///     Get and filter currently opened window handles.
+        /// </summary>
+        /// <returns>
+        ///     Return the group of window handles in form of List<IntPtr>.
+        /// </returns>
+        private List<IntPtr> GetWindowHandles() {
             WindowHandles = new List<IntPtr>();
             if (!EnumDesktopWindows(IntPtr.Zero, FilterCallback, IntPtr.Zero))
-                handles = null;
+                return null;
             else
-                handles = WindowHandles;
+                return WindowHandles;
         }
 
+        /// <summary>
+        ///     Filter if the handle actually has a window, visible, and suitable to block.
+        /// </summary>
+        /// <param name="hWnd">
+        ///     Window handle ID.
+        /// </param>
+        /// <returns>
+        ///     Return true if it passes the filter.
+        /// </returns>
         private bool FilterCallback(IntPtr hWnd, int lParam) {
             string title = GetWindowTitle(hWnd);
-            if (IsWindowVisible(hWnd) && !blockedHandles.Contains(hWnd) && !whitelist.Contains(title) && !string.IsNullOrEmpty(title))
+            if (IsWindowVisible(hWnd) && !blockedHandles.Contains(hWnd) && !exception.Contains(title) && !string.IsNullOrEmpty(title))
                 WindowHandles.Add(hWnd);
             return true;
         }
 
+        /// <summary>
+        ///     Get window title associated with window handle ID.
+        /// </summary>
+        /// <param name="hWnd">
+        ///     Window handle ID.
+        /// </param>
+        /// <returns>
+        ///     The title of window handle ID.
+        /// </returns>
         private string GetWindowTitle(IntPtr hWnd) {
             StringBuilder sb_title = new StringBuilder(1024);
             GetWindowText(hWnd, sb_title, sb_title.Capacity);
