@@ -16,9 +16,8 @@ namespace Lockdown {
             UserText.Text = $"Hello, {Environment.UserName}!";
 
             string path = Directory.GetCurrentDirectory() + @"\ProfilePic.jpg";
-            if (File.Exists(path)) {
+            if (File.Exists(path))
                 ProfilePic.Image = Image.FromFile(path);
-            }
             TopMost = true;
         }
 
@@ -26,23 +25,24 @@ namespace Lockdown {
             Update();
             Refresh();
 
-            ProfilePic.Location = new Point((Width - ProfilePic.Width) / 2, 0);
-            UserText.Location = new Point((Width - UserText.Width) / 2, ProfilePic.Height / 2 + 10);
+            ProfilePic.Location = new Point(Utils.CenterX(this, ProfilePic), 0);
+            UserText.Location = new Point(Utils.CenterX(this, UserText), ProfilePic.Height / 2 + 10);
+            
             StatusLabel.Location = addMargin(StatusLabel, UserText, 20);
-            PassPanel.Location = addMargin(PassPanel, StatusLabel, 50);
-
+            PassText.Location = addMargin(PassText, StatusLabel, 30);
+            PassPanel.Location = addMargin(PassPanel, PassText, 10);
             PassIndicator.Width = 0;
             PassIndicator.Location = addMargin(PassIndicator, PassPanel, 5);
 
-            Utils.smoothBorder(this, 12);
-            Utils.smoothBorder(MainPanel, 12);
-            Utils.smoothBorder(ProfilePic, ProfilePic.Width);
-            Utils.smoothBorder(PassPanel, PassPanel.Height / 2);
-            Utils.smoothBorder(PassIndicator, 6);
+            Utils.SmoothBorder(this, 12);
+            Utils.SmoothBorder(MainPanel, 12);
+            Utils.SmoothBorder(ProfilePic, ProfilePic.Width);
+            Utils.SmoothBorder(PassPanel, PassPanel.Height / 2);
+            Utils.SmoothBorder(PassIndicator, 6);
         }
 
         private void MainTimer_Tick(object sender, EventArgs e) {
-            lockdown.Lock();
+            //lockdown.Lock();
         }
         
         private void PassBox_TextChanged(object sender, EventArgs e) {
@@ -53,9 +53,9 @@ namespace Lockdown {
             else
                 PassIndicator.Width = PassBoxIndicator.Width;
 
-            PassIndicator.Left = (Width - PassIndicator.Width) / 2;
+            PassIndicator.Left = Utils.CenterX(this, PassIndicator);
             PassIndicator.Refresh();
-            Utils.smoothBorder(PassIndicator, 6);
+            Utils.SmoothBorder(PassIndicator, 6);
 
             if (PassBox.Text.Equals(pass)) {
                 MainTimer.Enabled = false;
@@ -77,7 +77,7 @@ namespace Lockdown {
         }
 
         private void Main_MouseMove(object sender, MouseEventArgs e) {
-            Utils.mouseMove(Handle);
+            Utils.MouseMove(Handle);
         }
     }
 }

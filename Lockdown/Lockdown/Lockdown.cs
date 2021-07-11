@@ -78,7 +78,7 @@ namespace Lockdown {
             exception.Add("NVIDIA Share");
             exception.Add("Taskmgr");
             exception.Add("Lockdown");
-            exception.Add("devenv");
+            //exception.Add("devenv"); // Visual Studio
             exception.Add("TextInputHost");
         }
 

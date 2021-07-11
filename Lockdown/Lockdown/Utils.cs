@@ -23,21 +23,33 @@ namespace Lockdown {
         [DllImport("Gdi32.dll", EntryPoint = "DeleteObject")]
         private static extern bool DeleteObject(IntPtr hObject);
 
-        public static void mouseMove(IntPtr handle) {
+        public static void MouseMove(IntPtr handle) {
             ReleaseCapture();
             SendMessage(handle, 0xA1, 0x2, 0);
         }
 
-        public static void smoothBorder(Form form, int round) {
+        public static void SmoothBorder(Form form, int round) {
             IntPtr ptr = CreateRoundRectRgn(0, 0, form.Width, form.Height, round, round);
             form.Region = Region.FromHrgn(ptr);
             DeleteObject(ptr);
         }
 
-        public static void smoothBorder(Control ctl, int round) {
+        public static void SmoothBorder(Control ctl, int round) {
             IntPtr ptr = CreateRoundRectRgn(0, 0, ctl.Width, ctl.Height, round, round);
             ctl.Region = Region.FromHrgn(ptr);
             DeleteObject(ptr);
+        }
+
+        public static Point Center(Control parent, Control target, int x = 0, int y = 0) {
+            return new Point((parent.Width - target.Width) / 2 + x, (parent.Height - parent.Height) / 2 + y);
+        }
+
+        public static int CenterX(Control parent, Control target, int x = 0) {
+            return (parent.Width - target.Width) / 2 + x;
+        }
+
+        public static int CenterY(Control parent, Control target, int y = 0) {
+            return (parent.Height - target.Height) / 2 + y;
         }
     }
 }

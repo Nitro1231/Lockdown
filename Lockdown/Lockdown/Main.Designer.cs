@@ -33,6 +33,7 @@
             this.StatusLabel = new System.Windows.Forms.Label();
             this.UserText = new System.Windows.Forms.Label();
             this.ProfilePic = new System.Windows.Forms.PictureBox();
+            this.PassText = new System.Windows.Forms.Label();
             this.MainPanel.SuspendLayout();
             this.PassPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ProfilePic)).BeginInit();
@@ -47,6 +48,7 @@
             // MainPanel
             // 
             this.MainPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.MainPanel.Controls.Add(this.PassText);
             this.MainPanel.Controls.Add(this.PassBoxIndicator);
             this.MainPanel.Controls.Add(this.PassIndicator);
             this.MainPanel.Controls.Add(this.PassPanel);
@@ -70,7 +72,7 @@
             // 
             // PassIndicator
             // 
-            this.PassIndicator.Location = new System.Drawing.Point(118, 236);
+            this.PassIndicator.Location = new System.Drawing.Point(126, 275);
             this.PassIndicator.Name = "PassIndicator";
             this.PassIndicator.Size = new System.Drawing.Size(240, 10);
             this.PassIndicator.TabIndex = 4;
@@ -81,7 +83,7 @@
             // 
             this.PassPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
             this.PassPanel.Controls.Add(this.PassBox);
-            this.PassPanel.Location = new System.Drawing.Point(118, 190);
+            this.PassPanel.Location = new System.Drawing.Point(126, 229);
             this.PassPanel.Name = "PassPanel";
             this.PassPanel.Size = new System.Drawing.Size(240, 40);
             this.PassPanel.TabIndex = 3;
@@ -136,6 +138,17 @@
             this.ProfilePic.TabStop = false;
             this.ProfilePic.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Main_MouseMove);
             // 
+            // PassText
+            // 
+            this.PassText.AutoSize = true;
+            this.PassText.Font = new System.Drawing.Font("Segoe UI Variable Display Semib", 14F, System.Drawing.FontStyle.Bold);
+            this.PassText.Location = new System.Drawing.Point(208, 183);
+            this.PassText.Name = "PassText";
+            this.PassText.Size = new System.Drawing.Size(93, 26);
+            this.PassText.TabIndex = 6;
+            this.PassText.Text = "Password";
+            this.PassText.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -176,6 +189,7 @@
         private System.Windows.Forms.Panel PassPanel;
         private System.Windows.Forms.Panel PassIndicator;
         private System.Windows.Forms.Label PassBoxIndicator;
+        private System.Windows.Forms.Label PassText;
     }
 }
 
